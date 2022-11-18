@@ -1,7 +1,12 @@
 # OpenVR2OSC
+
 An OSC app to be used with VRChat. It sets a given parameter to true when a corresponding controller button is held down.
 
-Currently nonfunctional. Will be updating over the next few days. (Technically if you were willing to convert every letter of each OSC endpoint by hand it's usable).
+Discord for support and roadmap: 
+
+[<img src="https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0b5061df29d55a92d945_full_logo_blurple_RGB.svg" alt="discord" width="80"/>](https://discord.gg/Wvnz28xeVM)
+
+The program is currently nonfunctional. Will be updating over the next few days. (Technically if you were willing to convert every letter of each OSC endpoint by hand it's usable).
 
 You would do that by running the program, hitting refresh mappings, then inputting your values into the config file by hand. 
 
