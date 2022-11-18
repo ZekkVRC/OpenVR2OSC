@@ -53,8 +53,8 @@
         </DockPanel>
         <GroupBox Header="Actions" Margin="10 0 10 10" HorizontalAlignment="Stretch" DockPanel.Dock="Top" Background="LavenderBlush">
             <WrapPanel Orientation="Horizontal" Margin="5">
-                <Button x:Name="Button_AppBinding" Margin="5,0,5,5" Focusable="False" Content="Add/remove app specific config" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5" Click="Button_AppBinding_Click" />
-                <Button x:Name="Button_ClearAll" Margin="5,0,5,5" Focusable="False" Content="Clear all current mappings" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5" Click="Button_ClearAll_Click"/>
+                <Button x:Name="Button_AppBinding" Margin="0,0,0,0" Width="0" Focusable="False" Content="DO NOT PRESS" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5"/>
+                <Button x:Name="Button_ClearAll" Margin="5,0,5,5" Focusable="False" Content="Refresh Mappings" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5" Click="Button_ClearAll_Click"/>
                 <Button x:Name="Button_Folder" Visibility="Hidden" Margin="5,0,5,5" Focusable="False" Content="Open config folder" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5" Click="Button_Folder_Click"/>
             </WrapPanel>
         </GroupBox>
@@ -66,8 +66,7 @@
                             <DataTemplate x:Name="DateTemplate_Binding">
                                 <DockPanel LastChildFill="True" x:Name="ListViewItem_Binding" HorizontalAlignment="Stretch">
                                     <Label x:Name="Label_Key" Width="60" HorizontalContentAlignment="Right" Content="{Binding Label}" DockPanel.Dock="Left"/>
-                                    <Button x:Name="Button_ClearCancel" Content="Clear" Width="75" DockPanel.Dock="Left" Click="Button_ClearCancel_Click" Focusable="False" BorderBrush="Gray"/>
-                                    <Label x:Name="Label_RecordSave" BorderThickness="1" MouseEnter="Label_HighlightOn" MouseLeave="Label_HighlightOff" BorderBrush="DarkGray" Background="LightGray" Foreground="Black" HorizontalContentAlignment="Center" Content="{Binding Text}" MouseUp="Label_RecordSave_Click"/>
+                                    <Label x:Name="Label_RecordSave" BorderThickness="1" BorderBrush="DarkGray" Background="LightGray" Foreground="Black" HorizontalContentAlignment="Center" Content="{Binding Text}"/>
                                 </DockPanel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

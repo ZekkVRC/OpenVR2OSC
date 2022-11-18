@@ -15,7 +15,7 @@ namespace OpenVR2Key
     public partial class MainWindow : Window
     {
         private static Mutex _mutex = null;
-        private readonly static string DEFAULT_KEY_LABEL = "Unbound: Click to bind keys to simulate";
+        private readonly static string DEFAULT_KEY_LABEL = "Not mapped to OSC target";
         private MainController _controller;
         private List<BindingItem> _items = new List<BindingItem>();
         private object _activeElement;
@@ -57,7 +57,8 @@ namespace OpenVR2Key
                     {
                         Label_OpenVR.Content = message;
                         Label_OpenVR.Background = color;
-                        if (!connected && _initDone && MainModel.LoadSetting(MainModel.Setting.ExitWithSteam)) {
+                        if (!connected && _initDone && MainModel.LoadSetting(MainModel.Setting.ExitWithSteam))
+                        {
                             if (_notifyIcon != null) _notifyIcon.Dispose();
                             System.Windows.Application.Current.Shutdown();
                         }
@@ -113,7 +114,8 @@ namespace OpenVR2Key
                 {
                     Dispatcher.Invoke(() =>
                     {
-                        if (!_dashboardIsVisible) {
+                        if (!_dashboardIsVisible)
+                        {
                             if (on) _activeKeys.Add(key);
                             else _activeKeys.Remove(key);
                             if (_activeKeys.Count > 0) Label_Keys.Content = string.Join(", ", _activeKeys);
@@ -192,7 +194,7 @@ namespace OpenVR2Key
             _notifyIcon.Click += NotifyIcon_Click;
             _notifyIcon.Text = $"Click to show the {Properties.Resources.AppName} window";
             _notifyIcon.Icon = icon;
-            _notifyIcon.Visible = true;            
+            _notifyIcon.Visible = true;
         }
 
         #region bindings
@@ -200,6 +202,10 @@ namespace OpenVR2Key
         // Fill list with entries
         private string[] InitList(Dictionary<string, Key[]> config = null)
         {
+            if (MainController.porterror)
+            {
+                WriteToLog("Error: Port 9001 was bound on application start. Please close all other OSC programs, then launch this again. Once launched you can restart other programs.");
+            }
             var actionKeys = new List<string>();
             actionKeys.AddRange(GenerateActionKeyRange(16, 'L')); // Left
             actionKeys.AddRange(GenerateActionKeyRange(16, 'R')); // Right
@@ -273,7 +279,7 @@ namespace OpenVR2Key
             var onlyInTray = MainModel.LoadSetting(MainModel.Setting.Tray);
             switch (WindowState)
             {
-                case WindowState.Minimized: 
+                case WindowState.Minimized:
                     ShowInTaskbar = !onlyInTray;
                     break;
                 default:
@@ -286,15 +292,16 @@ namespace OpenVR2Key
         #endregion
 
         #region actions
-        private void UpdateConfigButton(bool hasConfig, bool forceButtonOff=false)
+        private void UpdateConfigButton(bool hasConfig, bool forceButtonOff = false)
         {
             Debug.WriteLine($"Update Config Button: {hasConfig}");
-            if(!forceButtonOff && _controller.AppIsRunning())
+            if (!forceButtonOff && _controller.AppIsRunning())
             {
                 Button_AppBinding.Content = hasConfig ? "Remove app-specific config" : "Add app-specific config";
                 Button_AppBinding.IsEnabled = true;
                 Button_AppBinding.Tag = hasConfig;
-            } else
+            }
+            else
             {
                 Button_AppBinding.Content = "No application running right now";
                 Button_AppBinding.IsEnabled = false;
@@ -305,8 +312,9 @@ namespace OpenVR2Key
         // Click to either create new config for current app or remove the existing config.
         private void Button_AppBinding_Click(object sender, RoutedEventArgs e)
         {
+            /*
             var tag = (sender as Button).Tag;
-            switch(tag)
+            switch (tag)
             {
                 case null:
                     // This should never happen as the button cannot be pressed while disabled.
@@ -314,7 +322,7 @@ namespace OpenVR2Key
                 case true:
                     var result = MessageBox.Show(
                         Application.Current.MainWindow,
-                        "Are you sure you want to delete this configuration?",
+                        "I Dont Know How You Got Here, But CLICK NO. Otherwise, bye bye mappings.",
                         "OpenVR2Key",
                         MessageBoxButton.YesNo,
                         MessageBoxImage.Warning
@@ -333,23 +341,26 @@ namespace OpenVR2Key
                     _controller.LoadConfig(); // Loads the empty new one
                     UpdateConfigButton(true);
                     break;
-            }
+            } */
         }
 
         // This should clear all bindings from the current config
         private void Button_ClearAll_Click(object sender, RoutedEventArgs e)
         {
             var result = MessageBox.Show(
-                Application.Current.MainWindow, 
-                "Are you sure you want to clear all mappings in this configuration?",
+                Application.Current.MainWindow,
+                "Refresh",
                 "OpenVR2Key",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning
             );
-            if(result == MessageBoxResult.Yes)
+            if (result == MessageBoxResult.Yes)
             {
-                MainModel.ClearBindings();
-                InitList();
+                //MainModel.ClearBindings();
+                
+                MainModel.StoreConfig(MainModel.RetrieveConfig());
+                _controller.LoadConfig(true);
+                //InitList();
             }
         }
 

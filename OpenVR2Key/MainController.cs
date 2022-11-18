@@ -1,4 +1,5 @@
 ﻿using BOLL7708;
+using BuildSoft.VRChat.Osc;
 using GregsStack.InputSimulatorStandard;
 using GregsStack.InputSimulatorStandard.Native;
 using System;
@@ -24,6 +25,8 @@ namespace OpenVR2Key
         private HashSet<Key> _keys = new HashSet<Key>();
         private HashSet<Key> _keysDown = new HashSet<Key>();
 
+        public static bool porterror = false;
+
         // Actions
         public Action<bool> StatusUpdateAction { get; set; } = (status) => { Debug.WriteLine("No status action set."); };
         public Action<string> AppUpdateAction { get; set; } = (appId) => { Debug.WriteLine("No appID action set."); };
@@ -45,8 +48,17 @@ namespace OpenVR2Key
 
         public void Init(string[] actionKeys)
         {
+
             _actionKeys = actionKeys;
 
+            //Changes the receiving port, unfortunately VRCOscLib first attempts to bind 9001 when invoking this, and as such we need to catch that error and inform the user to close other programs first
+            try
+            {
+                OscUtility.ReceivePort = 9110;
+            }
+            catch {
+                porterror = true;
+            }
             // Sets default values for status labels
             StatusUpdateAction.Invoke(false);
             AppUpdateAction.Invoke(MainModel.CONFIG_DEFAULT);
@@ -99,18 +111,18 @@ namespace OpenVR2Key
         public bool OnKeyDown(Key key)
         {
             if (_registeringElement == null) return true;
-            if (MainUtils.MatchVirtualKey(key) != null)
-            {
-                if (_keysDown.Count == 0) _keys.Clear();
+            //if (MainUtils.MatchVirtualKey(key) != null)
+            //{
+                //if (_keysDown.Count == 0) _keys.Clear();
                 _keys.Add(key);
                 _keysDown.Add(key);
                 UpdateCurrentObject();
                 return true;
-            }
-            else
-            {
+            //}
+            //else
+            //{
                 return false;
-            }
+            //}
         }
         public void OnKeyUp(Key key)
         {
@@ -139,7 +151,7 @@ namespace OpenVR2Key
             {
                 result.Add(k.ToString());
             }
-            return string.Join(" + ", result.ToArray());
+            return string.Join("",result.ToArray());
         }
 
         #endregion
@@ -324,15 +336,17 @@ namespace OpenVR2Key
         // Simulate a keyboard press
         private void SimulateKeyPress(InputDigitalActionData_t data, Tuple<Key[], VirtualKeyCode[], VirtualKeyCode[]> binding)
         {
+            var tuplestring = GetKeysLabel(binding.Item1).ToString();
+            tuplestring = tuplestring.Replace(" ", "").Replace("+", "");
+            Debug.WriteLine(tuplestring);
             if (data.bState)
             {
-                foreach (var vk in binding.Item2) _sim.Keyboard.KeyDown(vk);
-                foreach (var vk in binding.Item3) _sim.Keyboard.KeyDown(vk);
+                
+                OscParameter.SendAvatarParameter(tuplestring, true);
             }
             else
             {
-                foreach (var vk in binding.Item3) _sim.Keyboard.KeyUp(vk);
-                foreach (var vk in binding.Item2) _sim.Keyboard.KeyUp(vk);
+                OscParameter.SendAvatarParameter(tuplestring, false);
             }
         }
         #endregion
