@@ -19,13 +19,13 @@
                     <CheckBox x:Name="CheckBox_HapticFeedback" Content="Do haptic pulse on triggering key" Margin="5 0 5 5" Focusable="False" Checked="CheckBox_HapticFeedback_Checked" Unchecked="CheckBox_HapticFeedback_Checked"/>
                     <StackPanel Orientation="Horizontal" Margin="5 0 5 5">
                         <TextBlock x:Name="textBlock_Help" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top">
-                            <Hyperlink NavigateUri="https://github.com/BOLL7708/OpenVR2Key" Click="ClickedURL">Help</Hyperlink>
+                            <Hyperlink NavigateUri="https://github.com/ZekkVRC/OpenVR2OSC#openvr2osc" Click="ClickedURL">Help</Hyperlink>
                         </TextBlock>
                         <TextBlock x:Name="textBlock_Issue" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10 0 10 0">
-                            <Hyperlink NavigateUri="https://github.com/BOLL7708/OpenVR2Key/issues" Click="ClickedURL">Report issue</Hyperlink>
+                            <Hyperlink NavigateUri="https://github.com/ZekkVRC/OpenVR2OSC/issues" Click="ClickedURL">Report issue</Hyperlink>
                         </TextBlock>
                         <TextBlock x:Name="textBlock_Twitter" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0 0 10 0">
-                            <Hyperlink NavigateUri="https://twitter.com/BOLL7708" Click="ClickedURL">Contact</Hyperlink>
+                            <Hyperlink NavigateUri="https://discord.gg/Q3exkuwAwd" Click="ClickedURL">Contact</Hyperlink>
                         </TextBlock>
                         <Label x:Name="Label_Version" Content="version" Padding="0"/>
                     </StackPanel>
