@@ -2,8 +2,9 @@
 
 Currently nonfunctional. Will be updating over the next few days. (Technically if you were willing to convert every letter of each OSC endpoint by hand its useable).
 
-you would do that by running the program, hitting refresh mappings, then inputting your values into the config file by hand. For example:
+You would do that by running the program, hitting refresh mappings, then inputting your values into the config file by hand. 
 
+For example:
 {"R3":[62,59,48,55,55]} would hit /avatar/parameters/SPELL with true when you hold the R3 binding (See your steamvr binding menu to determine which binding is which).
 
 In the next few days I am planning to create a solution that lets you generate binding files easily. 
