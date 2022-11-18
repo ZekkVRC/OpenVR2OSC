@@ -107,6 +107,9 @@ namespace OpenVR2Key
             _registeringElement = null;
         }
 
+
+        //Lots of this to remove, useless for this implementation.
+
         // Add incoming keys to the current binding
         public bool OnKeyDown(Key key)
         {
@@ -121,7 +124,7 @@ namespace OpenVR2Key
             //}
             //else
             //{
-                return false;
+                //return false;
             //}
         }
         public void OnKeyUp(Key key)
