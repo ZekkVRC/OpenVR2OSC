@@ -6,16 +6,18 @@ Discord for support and roadmap:
 
 [<img src="https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0b5061df29d55a92d945_full_logo_blurple_RGB.svg" alt="discord" width="80"/>](https://discord.gg/Wvnz28xeVM)
 
-The program is currently nonfunctional. Will be updating over the next few days. (Technically if you were willing to convert every letter of each OSC endpoint by hand it's usable).
+Usage:
+- Download the latest release of the OpenVR2OSC program.
+- \*Ensure that no other OSC programs are running/binding the 9001 port. Once the program is launched, you can restart your other OSC programs if necessary.
+- Open the steamVR bindings menu, select "choose another", if a choose binding page pops up hit the back button. Select more applications, and scroll till you find OpenVR2OSC. Click on it. In this menu you can see which keys correspond to which controller buttons. 
+- Find the controller button that you want to use to activate the OSC endpoint and enter said OSC endpoint into that key's respective textbox on the OpenVR2OSC menu.
+- Click the "Save bindings to config" button. 
+- \*\*Now whenever the program is running, pushing that controller button will set the assigned OSC endpoint to true.
 
-You would do that by running the program, hitting refresh mappings, then inputting your values into the config file by hand. 
+\*(After the initial launch, the OSC server binds itself to port 9110, unfortunately this is a limitation of the OSC library used. It is not required to use any sort of OSC router to transmit data to this port, as the program does not act on the incoming data. I hope to resolve this issue soon, or if VRChat implements OSC Query it will resolve on its own)
 
-For example:
-{"R3":[62,59,48,55,55],"L14":[62]} would hit /avatar/parameters/SPELL with true when you hold the R3 binding (See your steamvr binding menu to determine which binding is which), and /avatar/parameters/S when L14 is held.
+\*\*Opening the steamVR menu suspends the controller input to the program. This is to allow steamVR menu actions without accidentally setting off avatar features. 
 
-In the next few days I am planning to create a solution that lets you generate binding files easily. 
+Disclaimer and Thanks:
 
-Over time I hope to cut down the program significantly. BOLL7708s OpenVR2Key program that this uses as a base is very optimized for what it does, and as such isn't simple to change to suit what I want it to do. But it will get there eventually.
-
-Disclaimer:
-This is my first ever C# project, it is also the first project I am seriously using github for. Expect jank in the code, expect it to be messy until I get it in a functionality state that I like. Big thanks to BOLL7608 for creating OpenVR2Key which gave me a light at the end of the tunnel when it came to actually getting steamvr input to work. 
+This is my first ever C# project, it is also the first project I am putting up publicly on github. Expect jank in the code, expect it to be messy until I have the functionality ironed out and can go back in for a neatness pass. Big thanks to BOLL7608 for creating OpenVR2Key which gave me a light at the end of the tunnel when it came to actually getting steamVR input to work. Also a big thanks to ChanyaVRC for their handy VRCOscLib library.
