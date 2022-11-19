@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
@@ -27,7 +28,7 @@ namespace OpenVR2OSC
         private HashSet<Key> _keys = new HashSet<Key>();
         private HashSet<Key> _keysDown = new HashSet<Key>();
 
-        public static bool porterror = false;
+        
 
         // Actions
         public Action<bool> StatusUpdateAction { get; set; } = (status) => { Debug.WriteLine("No status action set."); };
@@ -42,7 +43,7 @@ namespace OpenVR2OSC
         private ulong _inputSourceHandleLeft = 0, _inputSourceHandleRight = 0;
         private ulong[] _inputSourceHandles = new ulong[10];
         private ulong _notificationOverlayHandle = 0;
-        private string[] _actionKeys = new string[0];
+        public static string[] _actionKeys = new string[0];
 
         public MainController()
         {
@@ -53,14 +54,7 @@ namespace OpenVR2OSC
 
             _actionKeys = actionKeys;
 
-            //Changes the receiving port, unfortunately VRCOscLib first attempts to bind 9001 when invoking this, and as such we need to catch that error and inform the user to close other programs first
-            try
-            {
-                OscUtility.ReceivePort = 9110;
-            }
-            catch {
-                porterror = true;
-            }
+
             // Sets default values for status labels
             StatusUpdateAction.Invoke(false);
             AppUpdateAction.Invoke(MainModel.CONFIG_DEFAULT);
@@ -322,8 +316,8 @@ namespace OpenVR2OSC
         {
             KeyActivatedAction.Invoke(actionKey, data.bState);
             Debug.WriteLine($"{actionKey} : " + (data.bState ? "PRESSED" : "RELEASED"));
-            //if (MainModel.BindingExists(actionKey))
-            //{ 
+            if (MainModel.BindingExists(actionKey))
+            { 
             var binding = MainModel.GetBinding(actionKey);
             if (data.bState)
             {
@@ -335,7 +329,7 @@ namespace OpenVR2OSC
                 if (MainModel.LoadSetting(MainModel.Setting.Notification))
                 {
                     var notificationBitmap = EasyOpenVRSingleton.BitmapUtils.NotificationBitmapFromBitmap(Properties.Resources.logo);
-                    //_ovr.EnqueueNotification(_notificationOverlayHandle, $"{actionKey} simulated {GetKeysLabel(binding.Item1)}", notificationBitmap);
+                    _ovr.EnqueueNotification(_notificationOverlayHandle, $"{actionKey} simulated {MainModel._bindings[0]}", notificationBitmap);
                 }
             }
 
@@ -343,19 +337,24 @@ namespace OpenVR2OSC
             int number = int.Parse(actionKey.Substring(1));
             if (letter == "L")
             {
-                number = number--;
+                number = number-1;
             }
             else if (letter == "R")
              {
                number += 15;
             }
-            else if (letter == "T")
-             {
+            else if (letter == "C")
+            {
                 number += 31;
             }
-            //Debug.WriteLine(MainModel._bindings[number].Text);
+            else if (letter == "T")
+            {
+                number += 47;
+            }
+            //Debug.WriteLine(MainModel.
+            //[number].Text);
             SimulateKeyPress(data, MainModel._bindings[number].Text);
-            //}
+            }
         }
         
         #endregion

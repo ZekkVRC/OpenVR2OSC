@@ -53,8 +53,8 @@
         </DockPanel>
         <GroupBox Header="Actions" Margin="10 0 10 10" HorizontalAlignment="Stretch" DockPanel.Dock="Top" Background="LavenderBlush">
             <WrapPanel Orientation="Horizontal" Margin="5">
-                <Button x:Name="Button_AppBinding" Margin="5,0,5,5" Focusable="False" Content="Dont Press" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5" Click="Button_AppBinding_Click"/>
-                <Button x:Name="Button_ClearAll" Margin="5,0,5,5" Focusable="False" Content="Load Mappings From Config" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5" Click="Button_ClearAll_Click"/>
+                <Button x:Name="Button_AppBinding" Margin="5,0,5,5" Focusable="False" Content="Save OSC Bindings To Config" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5" Click="Button_AppBinding_Click"/>
+                <Button x:Name="Button_ClearAll" Margin="5,0,5,5" Width="0" Focusable="False" Content="Load Bindings From Config" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5" Click="Button_ClearAll_Click"/>
                 <Button x:Name="Button_Folder" Visibility="Hidden" Margin="5,0,5,5" Focusable="False" Content="Open config folder" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5" Click="Button_Folder_Click"/>
             </WrapPanel>
         </GroupBox>

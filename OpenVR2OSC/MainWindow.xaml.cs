@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BuildSoft.VRChat.Osc;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -6,8 +7,11 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Documents.DocumentStructures;
 using System.Windows.Input;
 using System.Windows.Media;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace OpenVR2OSC
@@ -15,7 +19,7 @@ namespace OpenVR2OSC
     public partial class MainWindow : Window
     {
         private static Mutex _mutex = null;
-        private readonly static string DEFAULT_KEY_LABEL = "Replace me with an OSC endpoint! (ie: \"end\" would hit /avatar/parameters/end)";
+        private readonly static string DEFAULT_KEY_LABEL = "Replace me with an OSC endpoint! (for example \"end\" would hit /avatar/parameters/end)";
         private MainController _controller;
         private List<BindingItem> _items = new List<BindingItem>();
         //private object _activeElement;
@@ -24,6 +28,7 @@ namespace OpenVR2OSC
         private HashSet<string> _activeKeys = new HashSet<string>();
         private bool _initDone = false;
         private bool _dashboardIsVisible = false;
+        private static bool porterror = false;
         public MainWindow()
         {
             InitWindow();
@@ -35,13 +40,13 @@ namespace OpenVR2OSC
             if (!createdNew)
             {
                 MessageBox.Show(
-                    Application.Current.MainWindow,
+                    System.Windows.Application.Current.MainWindow,
                     "This application is already running!",
                     Properties.Resources.AppName,
                     MessageBoxButton.OK,
                     MessageBoxImage.Information
                 );
-                Application.Current.Shutdown();
+                System.Windows.Application.Current.Shutdown();
             }
 
 
@@ -157,6 +162,21 @@ namespace OpenVR2OSC
             });
 
             // Init the things
+
+            //Changes the receiving port, unfortunately VRCOscLib first attempts to bind 9001 when invoking this, and as such we need to catch that error and inform the user to close other programs first
+            try
+            {
+                OscUtility.ReceivePort = 9110;
+            }
+            catch
+            {
+                porterror = true;
+            }
+            if (porterror)
+            {
+                WriteToLog("Error: Port 9001 was bound on application start. Please close all other OSC programs, then launch this again. Once launched you can restart other programs.");
+            }
+
             var actionKeys = InitList();
             _controller.Init(actionKeys);
             InitSettings();
@@ -202,11 +222,33 @@ namespace OpenVR2OSC
         // Fill list with entries
         private string[] InitList(List<BindingItem> config = null)
         {
-            if (MainController.porterror)
-            {
-                WriteToLog("Error: Port 9001 was bound on application start. Please close all other OSC programs, then launch this again. Once launched you can restart other programs.");
-            }
+            _items.Clear();
+            config = MainModel.RetrieveConfig();
+
             var actionKeys = new List<string>();
+
+            if (config != null)
+            {
+                MainModel._bindings = config;
+                foreach (var bind in config)
+                {
+                    _items.Add(new BindingItem()
+                    {
+                        Key = bind.Key,
+                        Label = bind.Label,
+                        Text = bind.Text
+                    }) ;
+
+
+                    //MainModel._bindings = _items;
+                    actionKeys.Add(bind.Key);
+                }
+                MainModel.StoreConfig(MainModel._bindings);
+                ItemsControl_Bindings.ItemsSource = null;
+                ItemsControl_Bindings.ItemsSource = _items;
+                MainController._actionKeys = actionKeys.ToArray();
+                return actionKeys.ToArray();
+            }
             actionKeys.AddRange(GenerateActionKeyRange(16, 'L')); // Left
             actionKeys.AddRange(GenerateActionKeyRange(16, 'R')); // Right
             actionKeys.AddRange(GenerateActionKeyRange(16, 'C')); // Chord
@@ -219,13 +261,14 @@ namespace OpenVR2OSC
             }
 
             if (config == null) config = new List<BindingItem>();
-            _items.Clear();
+            
             foreach (var actionKey in actionKeys)
             {
                 var text = actionKey;//config.Contains(actionKey) ? actionKey : string.Empty;
                 if (actionKey == text) text = DEFAULT_KEY_LABEL;
                 //Debug.WriteLine("TextBeforeTheFall: " + text);
-                if (text.Contains("System.Windows.Controls.TextBox:")) text = text.Split(' ').GetValue(1).ToString(); _items.Add(new BindingItem()
+                if (text.Contains("System.Windows.Controls.TextBox:")) text = text.Split(' ').GetValue(1).ToString(); 
+                _items.Add(new BindingItem()
                 {
                     Key = actionKey,
                     Label = $"Key {actionKey}",
@@ -236,7 +279,7 @@ namespace OpenVR2OSC
             ItemsControl_Bindings.ItemsSource = _items;
 
             MainModel._bindings = _items;
-            MainModel.StoreConfig();
+            MainModel.StoreConfig(MainModel._bindings);
 
             return actionKeys.ToArray();
         }
@@ -258,58 +301,39 @@ namespace OpenVR2OSC
             TextBox b = (TextBox)sender;
             BindingItem identity = (BindingItem)b.DataContext;
             string key = identity.Key;
-            //string letter = key.Substring(0, 1);
-            //int number = int.Parse(key.Substring(1, key.Length));
-            //if (letter == "L")
-            //{
-
-            //}
-            //else if (letter == "R")
-           // {
-             //   number += 16;
-            //}
-            //else if (letter == "T")
-           // {
-            //    number += 32;
-            //}
-            //Debug.WriteLine(key);
-            var config = MainModel.RetrieveConfig();
-            //Debug.WriteLine("config in: " + config.ToString());
-            var actionKeys = new List<string>();
-            actionKeys.AddRange(GenerateActionKeyRange(16, 'L')); // Left
-            actionKeys.AddRange(GenerateActionKeyRange(16, 'R')); // Right
-            actionKeys.AddRange(GenerateActionKeyRange(16, 'C')); // Chord
-            actionKeys.AddRange(GenerateActionKeyRange(16, 'T')); // Tracker
-            string[] GenerateActionKeyRange(int count, char type)
+            int index = int.Parse(key.Substring(1));
+            string letter = key.Substring(0, 1);
+            if (letter == "L")
             {
-                var keys = new List<string>();
-                for (var i = 1; i <= count; i++) keys.Add($"{type}{i}");
-                return keys.ToArray();
+                index = index-1;
             }
-
-            if (config == null) config = new List<BindingItem>();//Dictionary<string, Key[]>();
+            else if (letter == "R")
+            {
+                index += 15;
+            }
+            else if (letter == "C")
+            {
+                index += 31;
+            }
+            else if (letter == "T")
+            {
+                index += 47;
+            }
+            //List<BindingItem> Temp = MainModel._bindings;
             _items.Clear();
-            foreach (var actionKey in actionKeys)
+            _items.Add(new BindingItem()
             {
-                string text = actionKey;//config.Contains(actionKey) ? actionKey: string.Empty;
-                if(actionKey == key)
-                {
-                    text = sender.ToString();
-                }
-                if (actionKey == text) text = DEFAULT_KEY_LABEL;
-                //Debug.WriteLine("TextBeforeTheFall: "+text);
-                if (text.Contains("System.Windows.Controls.TextBox:")) text = text.Split(' ').GetValue(1).ToString();
-                _items.Add(new BindingItem()
-                {
-                    Key = actionKey,
-                    Label = $"Key {actionKey}",
-                    Text = text
-                }) ;
-                
-            }
-            MainModel._bindings = _items;
-            MainModel.StoreConfig();
-
+                Key = key,
+                Label = identity.Label,
+                Text = b.Text
+            });
+            MainModel._bindings[index] = _items[0];
+            MainModel.StoreConfig(MainModel._bindings);
+            //InitList();
+            //var actionKeys = MainModel._bindings;
+            //System.Threading.Thread.Sleep(50);sdesf
+            //InitList();
+            //_controller.Init(MainController._actionKeys);
         }
         // All key down events in the app
         //private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -367,7 +391,7 @@ namespace OpenVR2OSC
             var tag = (sender as Button).Tag;
 
                     var result = MessageBox.Show(
-                        Application.Current.MainWindow,
+                        System.Windows.Application.Current.MainWindow,
                         "Save Config?",
                         "OpenVR2OSC",
                         MessageBoxButton.YesNo,
@@ -375,8 +399,8 @@ namespace OpenVR2OSC
                     );
                     if (result == MessageBoxResult.Yes)
                     {
-                        MainModel.StoreConfig();
-                        
+                         //MainModel.StoreConfig(MainModel._bindings);
+                         InitList();
                     }
            }
  
@@ -385,7 +409,7 @@ namespace OpenVR2OSC
         private void Button_ClearAll_Click(object sender, RoutedEventArgs e)
         {
             var result = MessageBox.Show(
-                Application.Current.MainWindow,
+                System.Windows.Application.Current.MainWindow,
                 "Refresh",
                 "OpenVR2OSC",
                 MessageBoxButton.YesNo,
@@ -396,7 +420,6 @@ namespace OpenVR2OSC
                 //MainModel.ClearBindings();
                 
                 MainModel.StoreConfig(MainModel.RetrieveConfig());
-                _controller.LoadConfig(true);
                 //InitList();
             }
         }

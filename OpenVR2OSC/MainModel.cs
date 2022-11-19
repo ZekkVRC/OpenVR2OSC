@@ -40,15 +40,16 @@ namespace OpenVR2OSC
         {
             lock (_bindingsLock) { 
                 _bindings = config;
+                //return config;
             }
         }
-        //static public bool BindingExists(string actionKey)
-        //{
-        //    lock (_bindingsLock)
-        //   {
-        //       return _bindings.ContainsKey(actionKey);
-        //   }
-        // }
+        static public bool BindingExists(string actionKey)
+        {
+            lock (_bindingsLock)
+           {
+                return true;//_bindings.ContainsKey(actionKey);
+           }
+        }
         public static string GetBinding(string actionkey)
         {
             lock (_bindingsLock)
@@ -150,9 +151,10 @@ namespace OpenVR2OSC
             var jsonString = File.Exists(configFilePath) ? File.ReadAllText(configFilePath) : null;
             if (jsonString != null)
             {
-                //Debug.WriteLine(jsonString);
+                Debug.WriteLine(jsonString);
                 var config = JsonConvert.DeserializeObject(jsonString, typeof(List<BindingItem>)) as List<BindingItem>;
                 RegisterBindings(config);
+                //Debug.WriteLine("Config: " + config);
                 return config;
             }
             return null;
