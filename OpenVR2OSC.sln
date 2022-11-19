@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.329
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33103.184
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenVR2Key", "OpenVR2Key\OpenVR2Key.csproj", "{752648BE-C543-40AA-98B2-722C886F5944}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenVR2OSC", "OpenVR2OSC\OpenVR2OSC.csproj", "{752648BE-C543-40AA-98B2-722C886F5944}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +26,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {3207F212-5A47-435E-9726-9CCE4B4C6CEA}
+		SolutionGuid = {FFBC2490-5A94-4EC4-8E4C-275B1E37ED13}
 	EndGlobalSection
 EndGlobal
