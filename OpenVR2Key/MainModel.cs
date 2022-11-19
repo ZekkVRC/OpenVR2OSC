@@ -2,9 +2,11 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
+using static OpenVR2Key.MainWindow;
 
 namespace OpenVR2Key
 {
@@ -13,53 +15,45 @@ namespace OpenVR2Key
         #region bindings
         public static readonly string CONFIG_DEFAULT = "default";
         private static readonly object _bindingsLock = new object();
-        private static Dictionary<string, Tuple<Key[], VirtualKeyCode[], VirtualKeyCode[]>> _bindings = new Dictionary<string, Tuple<Key[], VirtualKeyCode[], VirtualKeyCode[]>>();
+        public static List<BindingItem> _bindings { get; set; } = new List<BindingItem>();
         
         /**
          * Store key codes as virtual key codes.
          */
         static public void RegisterBinding(string actionKey, HashSet<Key> keys)
         {
-            var keysArr = new Key[keys.Count];
-            keys.CopyTo(keysArr);
-            var binding = MainUtils.ConvertKeys(keysArr);
-            lock (_bindingsLock)
-            {
-                _bindings[actionKey] = binding;
-                var config = new Dictionary<string, Key[]>();
-                foreach (var key in _bindings.Keys)
-                {
-                    config.Add(key, _bindings[key].Item1);
-                }
-                StoreConfig(config);
-            }
+            //var keysArr = new Key[keys.Count];
+            //keys.CopyTo(keysArr);
+            //var binding = MainUtils.ConvertKeys(keysArr);
+            //lock (_bindingsLock)
+           //{
+           //     _bindings[actionKey] = binding;
+           //     var config = new Dictionary<string, Key[]>();
+           //     foreach (var key in _bindings.Keys)
+           //     {
+           //         config.Add(key, _bindings[key].Item1);
+           //     }
+           //     StoreConfig(config);
+           // }
         }
-        static private void RegisterBindings(Dictionary<string, Key[]> config)
+        static private void RegisterBindings(List<BindingItem> config)
         {
-            var bindings = new Dictionary<string, Tuple<Key[], VirtualKeyCode[], VirtualKeyCode[]>>();
-            foreach (var key in config.Keys)
-            {
-                var keys = config[key];
-                var binding = MainUtils.ConvertKeys(keys);
-                bindings[key] = binding;
-            }
-            lock (_bindingsLock)
-            {
-                _bindings = bindings;
+            lock (_bindingsLock) { 
+                _bindings = config;
             }
         }
-        static public bool BindingExists(string actionKey)
-        {
-            lock (_bindingsLock)
-            {
-                return _bindings.ContainsKey(actionKey);
-            }
-        }
-        public static Tuple<Key[], VirtualKeyCode[], VirtualKeyCode[]> GetBinding(string actionkey)
+        //static public bool BindingExists(string actionKey)
+        //{
+        //    lock (_bindingsLock)
+        //   {
+        //       return _bindings.ContainsKey(actionKey);
+        //   }
+        // }
+        public static string GetBinding(string actionkey)
         {
             lock (_bindingsLock)
             {
-                return _bindings[actionkey];
+                return actionkey;
             }
         }
         static public void ClearBindings()
@@ -70,15 +64,15 @@ namespace OpenVR2Key
             }
             StoreConfig();
         }
-        static public void RemoveBinding(string actionKey)
+        static public void RemoveBinding(BindingItem actionKey)
         {
             lock (_bindingsLock)
             {
                 _bindings.Remove(actionKey);
-                var config = new Dictionary<string, Key[]>();
-                foreach (var key in _bindings.Keys)
+                var config = new List<BindingItem>();
+                foreach (var key in _bindings)
                 {
-                    config.Add(key, _bindings[key].Item1);
+                    config.Add(key);
                 }
                 StoreConfig(config);
             }
@@ -111,16 +105,18 @@ namespace OpenVR2Key
             return $"{Directory.GetCurrentDirectory()}\\config\\";
         }
 
-        static public void StoreConfig(Dictionary<string, Key[]> config = null, string configName = null)
+        static public void StoreConfig(List<BindingItem> config = null, string configName = null)
         {
+            //_bindings.Add("Tester123");
+            //_bindings.Add("L4helloworld");
             if (config == null)
             {
-                config = new Dictionary<string, Key[]>();
+                config = new List<BindingItem>();
                 lock (_bindingsLock)
                 {
-                    foreach (var key in _bindings.Keys)
+                    foreach (var key in _bindings)
                     {
-                        config.Add(key, _bindings[key].Item1);
+                        config.Add(key);
                     }
                 }
             }
@@ -131,6 +127,7 @@ namespace OpenVR2Key
             if (!Directory.Exists(configDir)) Directory.CreateDirectory(configDir);
             File.WriteAllText(configFilePath, jsonString);
         }
+
 
         static public void DeleteConfig(string configName = null)
         {
@@ -144,7 +141,7 @@ namespace OpenVR2Key
             }
         }
 
-        static public Dictionary<string, Key[]> RetrieveConfig(string configName = null)
+        static public List<BindingItem> RetrieveConfig(string configName = null)
         {
             if (configName == null) configName = _configName;
             CleanConfigName(ref configName);
@@ -153,7 +150,8 @@ namespace OpenVR2Key
             var jsonString = File.Exists(configFilePath) ? File.ReadAllText(configFilePath) : null;
             if (jsonString != null)
             {
-                var config = JsonConvert.DeserializeObject(jsonString, typeof(Dictionary<string, Key[]>)) as Dictionary<string, Key[]>;
+                //Debug.WriteLine(jsonString);
+                var config = JsonConvert.DeserializeObject(jsonString, typeof(List<BindingItem>)) as List<BindingItem>;
                 RegisterBindings(config);
                 return config;
             }

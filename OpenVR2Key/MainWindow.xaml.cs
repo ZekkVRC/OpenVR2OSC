@@ -15,10 +15,10 @@ namespace OpenVR2Key
     public partial class MainWindow : Window
     {
         private static Mutex _mutex = null;
-        private readonly static string DEFAULT_KEY_LABEL = "Not mapped to OSC target";
+        private readonly static string DEFAULT_KEY_LABEL = "Replace me with an OSC endpoint! (ie: \"end\" would hit /avatar/parameters/end)";
         private MainController _controller;
         private List<BindingItem> _items = new List<BindingItem>();
-        private object _activeElement;
+        //private object _activeElement;
         private string _currentlyRunningAppId = MainModel.CONFIG_DEFAULT;
         private System.Windows.Forms.NotifyIcon _notifyIcon;
         private HashSet<string> _activeKeys = new HashSet<string>();
@@ -85,24 +85,24 @@ namespace OpenVR2Key
                 },
 
                 // We should update the text on the current binding we are recording
-                KeyTextUpdateAction = (keyText, cancel) =>
-                {
-                    Debug.WriteLine($"Key Text Update Action: keyText={keyText}");
-                    Dispatcher.Invoke(() =>
-                    {
-                        if (_activeElement != null)
-                        {
-                            (_activeElement as Label).Content = keyText;
-                            if (cancel) UpdateLabel(_activeElement as Label, false);
-                        }
-                    });
-                },
+                //KeyTextUpdateAction = (keyText, cancel) =>
+                //{
+                //    Debug.WriteLine($"Key Text Update Action: keyText={keyText}");
+                //    Dispatcher.Invoke(() =>
+                //    {
+                //        if (_activeElement != null)
+                //        {
+                //           (_activeElement as Label).Content = keyText;
+                //            if (cancel) UpdateLabel(_activeElement as Label, false);
+                //        }
+                //    });
+                //},
 
                 // We have loaded a config
                 ConfigRetrievedAction = (config, forceButtonOff) =>
                 {
                     var loaded = config != null;
-                    if (loaded) Debug.WriteLine($"Config Retrieved Action: count()={config.Count}");
+                    //if (loaded) Debug.WriteLine($"Config Retrieved Action: count()={config.Count}");
                     Dispatcher.Invoke(() =>
                     {
                         if (loaded) InitList(config);
@@ -200,7 +200,7 @@ namespace OpenVR2Key
         #region bindings
 
         // Fill list with entries
-        private string[] InitList(Dictionary<string, Key[]> config = null)
+        private string[] InitList(List<BindingItem> config = null)
         {
             if (MainController.porterror)
             {
@@ -218,13 +218,14 @@ namespace OpenVR2Key
                 return keys.ToArray();
             }
 
-            if (config == null) config = new Dictionary<string, Key[]>();
+            if (config == null) config = new List<BindingItem>();
             _items.Clear();
             foreach (var actionKey in actionKeys)
             {
-                var text = config.ContainsKey(actionKey) ? _controller.GetKeysLabel(config[actionKey]) : string.Empty;
-                if (text == string.Empty) text = DEFAULT_KEY_LABEL;
-                _items.Add(new BindingItem()
+                var text = actionKey;//config.Contains(actionKey) ? actionKey : string.Empty;
+                if (actionKey == text) text = DEFAULT_KEY_LABEL;
+                //Debug.WriteLine("TextBeforeTheFall: " + text);
+                if (text.Contains("System.Windows.Controls.TextBox:")) text = text.Split(' ').GetValue(1).ToString(); _items.Add(new BindingItem()
                 {
                     Key = actionKey,
                     Label = $"Key {actionKey}",
@@ -234,8 +235,13 @@ namespace OpenVR2Key
             ItemsControl_Bindings.ItemsSource = null;
             ItemsControl_Bindings.ItemsSource = _items;
 
+            MainModel._bindings = _items;
+            MainModel.StoreConfig();
+
             return actionKeys.ToArray();
         }
+
+
 
         // Binding data class
         public class BindingItem
@@ -247,26 +253,84 @@ namespace OpenVR2Key
         #endregion
 
         #region events
-        // All key down events in the app
-        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void Update_Textbox(object sender, TextChangedEventArgs e)
         {
-            e.Handled = true;
-            var key = e.Key == Key.System ? e.SystemKey : e.Key;
-            if (!_controller.OnKeyDown(key))
+            TextBox b = (TextBox)sender;
+            BindingItem identity = (BindingItem)b.DataContext;
+            string key = identity.Key;
+            //string letter = key.Substring(0, 1);
+            //int number = int.Parse(key.Substring(1, key.Length));
+            //if (letter == "L")
+            //{
+
+            //}
+            //else if (letter == "R")
+           // {
+             //   number += 16;
+            //}
+            //else if (letter == "T")
+           // {
+            //    number += 32;
+            //}
+            //Debug.WriteLine(key);
+            var config = MainModel.RetrieveConfig();
+            //Debug.WriteLine("config in: " + config.ToString());
+            var actionKeys = new List<string>();
+            actionKeys.AddRange(GenerateActionKeyRange(16, 'L')); // Left
+            actionKeys.AddRange(GenerateActionKeyRange(16, 'R')); // Right
+            actionKeys.AddRange(GenerateActionKeyRange(16, 'C')); // Chord
+            actionKeys.AddRange(GenerateActionKeyRange(16, 'T')); // Tracker
+            string[] GenerateActionKeyRange(int count, char type)
             {
-                string message = $"Key not mapped: " + key.ToString();
-                WriteToLog(message);
+                var keys = new List<string>();
+                for (var i = 1; i <= count; i++) keys.Add($"{type}{i}");
+                return keys.ToArray();
             }
 
+            if (config == null) config = new List<BindingItem>();//Dictionary<string, Key[]>();
+            _items.Clear();
+            foreach (var actionKey in actionKeys)
+            {
+                string text = actionKey;//config.Contains(actionKey) ? actionKey: string.Empty;
+                if(actionKey == key)
+                {
+                    text = sender.ToString();
+                }
+                if (actionKey == text) text = DEFAULT_KEY_LABEL;
+                //Debug.WriteLine("TextBeforeTheFall: "+text);
+                if (text.Contains("System.Windows.Controls.TextBox:")) text = text.Split(' ').GetValue(1).ToString();
+                _items.Add(new BindingItem()
+                {
+                    Key = actionKey,
+                    Label = $"Key {actionKey}",
+                    Text = text
+                }) ;
+                
+            }
+            MainModel._bindings = _items;
+            MainModel.StoreConfig();
+
         }
+        // All key down events in the app
+        //private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        //{
+        //   e.Handled = true;
+        //   var key = e.Key == Key.System ? e.SystemKey : e.Key;
+        //  if (!_controller.OnKeyDown(key))
+        //  {
+        //       string message = $"Key not mapped: " + key.ToString();
+        //      WriteToLog(message);
+        //  }
+
+        //}
 
         // All key up events in the app
-        private void Window_PreviewKeyUp(object sender, KeyEventArgs e)
-        {
-            e.Handled = true;
-            var key = e.Key == Key.System ? e.SystemKey : e.Key;
-            _controller.OnKeyUp(key);
-        }
+        //private void Window_PreviewKeyUp(object sender, KeyEventArgs e)
+        //{
+        //    e.Handled = true;
+        //    var key = e.Key == Key.System ? e.SystemKey : e.Key;
+        //    _controller.OnKeyUp(key);
+        //}
 
         protected override void OnClosing(CancelEventArgs e)
         {
@@ -294,55 +358,28 @@ namespace OpenVR2Key
         #region actions
         private void UpdateConfigButton(bool hasConfig, bool forceButtonOff = false)
         {
-            Debug.WriteLine($"Update Config Button: {hasConfig}");
-            if (!forceButtonOff && _controller.AppIsRunning())
-            {
-                Button_AppBinding.Content = hasConfig ? "Remove app-specific config" : "Add app-specific config";
-                Button_AppBinding.IsEnabled = true;
-                Button_AppBinding.Tag = hasConfig;
-            }
-            else
-            {
-                Button_AppBinding.Content = "No application running right now";
-                Button_AppBinding.IsEnabled = false;
-                Button_AppBinding.Tag = null;
-            }
+            
         }
 
         // Click to either create new config for current app or remove the existing config.
         private void Button_AppBinding_Click(object sender, RoutedEventArgs e)
         {
-            /*
             var tag = (sender as Button).Tag;
-            switch (tag)
-            {
-                case null:
-                    // This should never happen as the button cannot be pressed while disabled.
-                    break;
-                case true:
+
                     var result = MessageBox.Show(
                         Application.Current.MainWindow,
-                        "I Dont Know How You Got Here, But CLICK NO. Otherwise, bye bye mappings.",
+                        "Save Config?",
                         "OpenVR2Key",
                         MessageBoxButton.YesNo,
                         MessageBoxImage.Warning
                     );
                     if (result == MessageBoxResult.Yes)
                     {
-                        MainModel.ClearBindings();
-                        MainModel.DeleteConfig();
-                        _controller.LoadConfig(true); // Loads default
-                        UpdateConfigButton(false);
+                        MainModel.StoreConfig();
+                        
                     }
-                    break;
-                case false:
-                    MainModel.SetConfigName(_currentlyRunningAppId);
-                    MainModel.StoreConfig(new Dictionary<string, Key[]>());
-                    _controller.LoadConfig(); // Loads the empty new one
-                    UpdateConfigButton(true);
-                    break;
-            } */
-        }
+           }
+ 
 
         // This should clear all bindings from the current config
         private void Button_ClearAll_Click(object sender, RoutedEventArgs e)
@@ -368,49 +405,52 @@ namespace OpenVR2Key
         {
             _controller.OpenConfigFolder();
         }
+
+
         #endregion
 
         #region bindings
+
         // Main action that is clicked from the list to start and end registration of keys
-        private void Label_RecordSave_Click(object sender, MouseButtonEventArgs e)
-        {
-            var element = sender as Label;
-            var dataItem = element.DataContext as BindingItem;
-            var active = _controller.ToggleRegisteringKey(dataItem.Key, element, out object activeElement);
-            UpdateLabel(activeElement as Label, active);
-            if (active) _activeElement = activeElement;
-            else _activeElement = null;
-        }
+        //private void Label_RecordSave_Click(object sender, MouseButtonEventArgs e)
+        //{
+        //var element = sender as Label;
+        //var dataItem = element.DataContext as BindingItem;
+        //var active = _controller.ToggleRegisteringKey(dataItem.Key, element, out object activeElement);
+        //UpdateLabel(activeElement as Label, active);
+        //if (active) _activeElement = activeElement;
+        //else _activeElement = null;
+        //}
 
-        private void UpdateLabel(Label label, bool active)
-        {
-            {
-                label.Foreground = active ? Brushes.DarkRed : Brushes.Black;
-                label.BorderBrush = active ? Brushes.Tomato : Brushes.DarkGray;
-                label.Background = active ? Brushes.LightPink : Brushes.LightGray;
-            }
-        }
+        //private void UpdateLabel(Label label, bool active)
+        //{
+        //   {
+        //       label.Foreground = active ? Brushes.DarkRed : Brushes.Black;
+        //      label.BorderBrush = active ? Brushes.Tomato : Brushes.DarkGray;
+        //      label.Background = active ? Brushes.LightPink : Brushes.LightGray;
+        //  }
+        //}
 
-        private void Label_HighlightOn(object sender, RoutedEventArgs e)
-        {
-            if (_activeElement != sender) (sender as Label).Background = Brushes.WhiteSmoke;
-        }
+        //private void Label_HighlightOn(object sender, RoutedEventArgs e)
+        //{
+        //    if (_activeElement != sender) (sender as Label).Background = Brushes.WhiteSmoke;
+        //}
 
-        private void Label_HighlightOff(object sender, RoutedEventArgs e)
-        {
-            if (_activeElement != sender) (sender as Label).Background = Brushes.LightGray;
-        }
+        //private void Label_HighlightOff(object sender, RoutedEventArgs e)
+        //{
+        //    if (_activeElement != sender) (sender as Label).Background = Brushes.LightGray;
+        //}
 
         // Clear the current binding
-        private void Button_ClearCancel_Click(object sender, RoutedEventArgs e)
-        {
-            var button = sender as Button;
-            var dataItem = button.DataContext as BindingItem;
-            MainModel.RemoveBinding(dataItem.Key);
-            DockPanel sp = VisualTreeHelper.GetParent(button) as DockPanel;
-            var element = sp.Children[2] as Label;
-            element.Content = DEFAULT_KEY_LABEL;
-        }
+        //private void Button_ClearCancel_Click(object sender, RoutedEventArgs e)
+        //{
+         //   var button = sender as Button;
+         //   var dataItem = button.DataContext as BindingItem;
+         //   MainModel.RemoveBinding(dataItem.Key);
+         //   DockPanel sp = VisualTreeHelper.GetParent(button) as DockPanel;
+         //   var element = sp.Children[2] as Label;
+         //   element.Content = DEFAULT_KEY_LABEL;
+       // }
         #endregion
 
         #region settings

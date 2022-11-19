@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenVR2Key"
         mc:Ignorable="d"
-        Title="OpenVR2Key" Height="550" Width="750" StateChanged="Window_StateChanged" Icon="resources/logo.ico" PreviewKeyDown="Window_PreviewKeyDown" PreviewKeyUp="Window_PreviewKeyUp">
+        Title="OpenVR2OSC" Height="550" Width="750" StateChanged="Window_StateChanged" Icon="resources/logo.ico">
     <DockPanel LastChildFill="True">
         <DockPanel LastChildFill="True" DockPanel.Dock="Top">
             <GroupBox Header="Settings &amp; Help" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" DockPanel.Dock="Left" Background="AliceBlue">
@@ -53,8 +53,8 @@
         </DockPanel>
         <GroupBox Header="Actions" Margin="10 0 10 10" HorizontalAlignment="Stretch" DockPanel.Dock="Top" Background="LavenderBlush">
             <WrapPanel Orientation="Horizontal" Margin="5">
-                <Button x:Name="Button_AppBinding" Margin="0,0,0,0" Width="0" Focusable="False" Content="DO NOT PRESS" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5"/>
-                <Button x:Name="Button_ClearAll" Margin="5,0,5,5" Focusable="False" Content="Refresh Mappings" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5" Click="Button_ClearAll_Click"/>
+                <Button x:Name="Button_AppBinding" Margin="5,0,5,5" Focusable="False" Content="Dont Press" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5" Click="Button_AppBinding_Click"/>
+                <Button x:Name="Button_ClearAll" Margin="5,0,5,5" Focusable="False" Content="Load Mappings From Config" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5" Click="Button_ClearAll_Click"/>
                 <Button x:Name="Button_Folder" Visibility="Hidden" Margin="5,0,5,5" Focusable="False" Content="Open config folder" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5" Click="Button_Folder_Click"/>
             </WrapPanel>
         </GroupBox>
@@ -66,7 +66,7 @@
                             <DataTemplate x:Name="DateTemplate_Binding">
                                 <DockPanel LastChildFill="True" x:Name="ListViewItem_Binding" HorizontalAlignment="Stretch">
                                     <Label x:Name="Label_Key" Width="60" HorizontalContentAlignment="Right" Content="{Binding Label}" DockPanel.Dock="Left"/>
-                                    <Label x:Name="Label_RecordSave" BorderThickness="1" BorderBrush="DarkGray" Background="LightGray" Foreground="Black" HorizontalContentAlignment="Center" Content="{Binding Text}"/>
+                                    <TextBox x:Name="Label_RecordSave" TextChanged="Update_Textbox" BorderThickness="1" BorderBrush="DarkGray" Background="LightGray" Foreground="Black" HorizontalContentAlignment="Center" Text="{Binding Text}"/>
                                 </DockPanel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

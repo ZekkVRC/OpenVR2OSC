@@ -8,8 +8,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using Valve.VR;
+using static OpenVR2Key.MainWindow;
 
 namespace OpenVR2Key
 {
@@ -31,7 +33,7 @@ namespace OpenVR2Key
         public Action<bool> StatusUpdateAction { get; set; } = (status) => { Debug.WriteLine("No status action set."); };
         public Action<string> AppUpdateAction { get; set; } = (appId) => { Debug.WriteLine("No appID action set."); };
         public Action<string, bool> KeyTextUpdateAction { get; set; } = (status, cancel) => { Debug.WriteLine("No key text action set."); };
-        public Action<Dictionary<string, Key[]>, bool> ConfigRetrievedAction { get; set; } = (config, forceButtonOff) => { Debug.WriteLine("No config loaded."); };
+        public Action<List<BindingItem>, bool> ConfigRetrievedAction { get; set; } = (config, forceButtonOff) => { Debug.WriteLine("No config loaded."); };
         public Action<string, bool> KeyActivatedAction { get; set; } = (key, on) => { Debug.WriteLine("No key simulated action set."); };
         public Action<bool> DashboardVisibleAction { get; set; } = (visible) => { Debug.WriteLine("No dashboard visible action set."); };
 
@@ -93,7 +95,7 @@ namespace OpenVR2Key
                 activeElement = _registeringElement;
                 MainModel.RegisterBinding(_registeringKey, _keys); // TODO: Should only save existing configs
                 _registeringKey = string.Empty;
-                _registeringElement = null;
+               _registeringElement = null;
             }
             return active;
         }
@@ -134,6 +136,13 @@ namespace OpenVR2Key
             _keysDown.Remove(key);
             UpdateCurrentObject();
         }
+
+        //public List StrToKey(String keystring)
+       // {
+       //     List<string> returnval = new List<string>();
+
+       // }
+
 
         // Send text to UI to update label
         private void UpdateCurrentObject(bool cancel=false)
@@ -179,7 +188,7 @@ namespace OpenVR2Key
                         UpdateAppId();
                         StatusUpdateAction.Invoke(true);
                         UpdateInputSourceHandles();
-                        _notificationOverlayHandle = _ovr.InitNotificationOverlay("OpenVR2Key");
+                        _notificationOverlayHandle = _ovr.InitNotificationOverlay("OpenVR2OSC");
 
                         _ovr.RegisterEvent(EVREventType.VREvent_Quit, (data) =>
                         {
@@ -290,7 +299,7 @@ namespace OpenVR2Key
                 Process.Start(startInfo);
         } else
             {
-                MessageBox.Show("Folder does not exist yet as no config has been saved.");
+                System.Windows.MessageBox.Show("Folder does not exist yet as no config has been saved.");
             }
         }
         #endregion
@@ -313,35 +322,51 @@ namespace OpenVR2Key
         {
             KeyActivatedAction.Invoke(actionKey, data.bState);
             Debug.WriteLine($"{actionKey} : " + (data.bState ? "PRESSED" : "RELEASED"));
-            if (MainModel.BindingExists(actionKey))
+            //if (MainModel.BindingExists(actionKey))
+            //{ 
+            var binding = MainModel.GetBinding(actionKey);
+            if (data.bState)
             {
-                var binding = MainModel.GetBinding(actionKey);
-                if (data.bState)
+                if (MainModel.LoadSetting(MainModel.Setting.Haptic))
                 {
-                    if (MainModel.LoadSetting(MainModel.Setting.Haptic))
-                    {
-                        if (inputSourceHandle == _inputSourceHandleLeft) _ovr.TriggerHapticPulseInController(ETrackedControllerRole.LeftHand);
-                        if (inputSourceHandle == _inputSourceHandleRight) _ovr.TriggerHapticPulseInController(ETrackedControllerRole.RightHand);
-                    }
-                    if (MainModel.LoadSetting(MainModel.Setting.Notification))
-                    {
-                        var notificationBitmap = EasyOpenVRSingleton.BitmapUtils.NotificationBitmapFromBitmap(Properties.Resources.logo);
-                        _ovr.EnqueueNotification(_notificationOverlayHandle, $"{actionKey} simulated {GetKeysLabel(binding.Item1)}", notificationBitmap);
-                    }
+                    if (inputSourceHandle == _inputSourceHandleLeft) _ovr.TriggerHapticPulseInController(ETrackedControllerRole.LeftHand);
+                    if (inputSourceHandle == _inputSourceHandleRight) _ovr.TriggerHapticPulseInController(ETrackedControllerRole.RightHand);
                 }
-                SimulateKeyPress(data, binding);
+                if (MainModel.LoadSetting(MainModel.Setting.Notification))
+                {
+                    var notificationBitmap = EasyOpenVRSingleton.BitmapUtils.NotificationBitmapFromBitmap(Properties.Resources.logo);
+                    //_ovr.EnqueueNotification(_notificationOverlayHandle, $"{actionKey} simulated {GetKeysLabel(binding.Item1)}", notificationBitmap);
+                }
             }
+
+            string letter = actionKey.Substring(0, 1);
+            int number = int.Parse(actionKey.Substring(1));
+            if (letter == "L")
+            {
+                number = number--;
+            }
+            else if (letter == "R")
+             {
+               number += 15;
+            }
+            else if (letter == "T")
+             {
+                number += 31;
+            }
+            //Debug.WriteLine(MainModel._bindings[number].Text);
+            SimulateKeyPress(data, MainModel._bindings[number].Text);
+            //}
         }
+        
         #endregion
 
         #region keyboard_out
 
         // Simulate a keyboard press
-        private void SimulateKeyPress(InputDigitalActionData_t data, Tuple<Key[], VirtualKeyCode[], VirtualKeyCode[]> binding)
+        private void SimulateKeyPress(InputDigitalActionData_t data, string binding)
         {
-            var tuplestring = GetKeysLabel(binding.Item1).ToString();
-            tuplestring = tuplestring.Replace(" ", "").Replace("+", "");
-            Debug.WriteLine(tuplestring);
+            var tuplestring = binding;
+            //Debug.WriteLine(tuplestring);
             if (data.bState)
             {
                 
