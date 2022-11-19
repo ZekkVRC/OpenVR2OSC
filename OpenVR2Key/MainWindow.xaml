@@ -1,9 +1,9 @@
-﻿<Window x:Class="OpenVR2Key.MainWindow"
+﻿<Window x:Class="OpenVR2OSC.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:OpenVR2Key"
+        xmlns:local="clr-namespace:OpenVR2OSC"
         mc:Ignorable="d"
         Title="OpenVR2OSC" Height="550" Width="750" StateChanged="Window_StateChanged" Icon="resources/logo.ico">
     <DockPanel LastChildFill="True">

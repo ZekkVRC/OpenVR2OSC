@@ -6,9 +6,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
-using static OpenVR2Key.MainWindow;
+using static OpenVR2OSC.MainWindow;
 
-namespace OpenVR2Key
+namespace OpenVR2OSC
 {
     static class MainModel
     {

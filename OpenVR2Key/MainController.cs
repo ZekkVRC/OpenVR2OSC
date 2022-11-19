@@ -11,9 +11,9 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Valve.VR;
-using static OpenVR2Key.MainWindow;
+using static OpenVR2OSC.MainWindow;
 
-namespace OpenVR2Key
+namespace OpenVR2OSC
 {
     class MainController
     {
@@ -182,7 +182,7 @@ namespace OpenVR2Key
                     {
                         initComplete = true;
 
-                        _ovr.AddApplicationManifest("./app.vrmanifest", "boll7708.openvr2key", true);
+                        _ovr.AddApplicationManifest("./app.vrmanifest", "ZekkVRC.OpenVR2OSC", true);
                         _ovr.LoadActionManifest("./actions.json");
                         RegisterActions();
                         UpdateAppId();

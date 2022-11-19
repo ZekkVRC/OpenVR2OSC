@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OpenVR2Key.Properties {
+namespace OpenVR2OSC.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace OpenVR2Key.Properties {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("OpenVR2Key.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("OpenVR2OSC.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,7 +61,7 @@ namespace OpenVR2Key.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to OpenVR2Key.
+        ///   Looks up a localized string similar to OpenVR2OSC.
         /// </summary>
         public static string AppName {
             get {

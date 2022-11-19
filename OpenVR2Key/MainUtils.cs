@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Input;
 
-namespace OpenVR2Key
+namespace OpenVR2OSC
 {
     public static class MainUtils
     {

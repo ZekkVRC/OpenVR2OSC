@@ -10,7 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
-namespace OpenVR2Key
+namespace OpenVR2OSC
 {
     public partial class MainWindow : Window
     {
@@ -369,7 +369,7 @@ namespace OpenVR2Key
                     var result = MessageBox.Show(
                         Application.Current.MainWindow,
                         "Save Config?",
-                        "OpenVR2Key",
+                        "OpenVR2OSC",
                         MessageBoxButton.YesNo,
                         MessageBoxImage.Warning
                     );
@@ -387,7 +387,7 @@ namespace OpenVR2Key
             var result = MessageBox.Show(
                 Application.Current.MainWindow,
                 "Refresh",
-                "OpenVR2Key",
+                "OpenVR2OSC",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning
             );
