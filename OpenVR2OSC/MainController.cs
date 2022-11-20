@@ -1,15 +1,11 @@
 ﻿using BOLL7708;
 using BuildSoft.VRChat.Osc;
 using GregsStack.InputSimulatorStandard;
-using GregsStack.InputSimulatorStandard.Native;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Threading;
-using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Input;
 using Valve.VR;
 using static OpenVR2OSC.MainWindow;
