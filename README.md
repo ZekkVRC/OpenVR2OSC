@@ -20,7 +20,8 @@ Usage:
 
 
 
-If you are looking to pass raw input such as the hand skeleton and touchpad data from knuckles controllers, check out KadachiiVR's Knuckles_to_osc: (https://github.com/KadachiiVR/knuckles_to_osc)!
+If you are looking to do face expressions using the knuckles trackpad, check out KadachiiVR's Knuckles_to_osc: (https://github.com/KadachiiVR/knuckles_to_osc)!
+They should have a unity script soon that easily converts facial expressions to use OSC inputs.
 
 Disclaimer and Thanks:
 
