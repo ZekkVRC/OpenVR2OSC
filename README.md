@@ -18,6 +18,10 @@ Usage:
 
 \*\*Opening the steamVR menu suspends the controller input to the program. This is to allow steamVR menu actions without accidentally setting off avatar features. 
 
+
+
+If you are looking to pass raw input such as the hand skeleton and touchpad data from knuckles controllers, check out KadachiiVR's Knuckles_to_osc: (https://github.com/KadachiiVR/knuckles_to_osc)!
+
 Disclaimer and Thanks:
 
 This is my first ever C# project, it is also the first project I am putting up publicly on github. Expect jank in the code, expect it to be messy until I have the functionality ironed out and can go back in for a neatness pass. Big thanks to BOLL7608 for creating OpenVR2Key which gave me a light at the end of the tunnel when it came to actually getting steamVR input to work. Also a big thanks to ChanyaVRC for their handy VRCOscLib library.
