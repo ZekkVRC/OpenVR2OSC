@@ -25,4 +25,4 @@ They should have a unity script soon that easily converts facial expressions to 
 
 Disclaimer and Thanks:
 
-This is my first ever C# project, it is also the first project I am putting up publicly on github. Expect jank in the code, expect it to be messy until I have the functionality ironed out and can go back in for a neatness pass. Big thanks to BOLL7608 for creating OpenVR2Key which gave me a light at the end of the tunnel when it came to actually getting steamVR input to work. Also a big thanks to ChanyaVRC for their handy VRCOscLib library.
+Code in desperate need of a neatness pass, ill get to it, eventually. Big thanks to BOLL7608 for creating OpenVR2Key which gave me a light at the end of the tunnel when it came to actually getting steamVR input to work. Also a big thanks to ChanyaVRC for their handy VRCOscLib library.
